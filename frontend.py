@@ -1,38 +1,32 @@
 import streamlit as st
 from uuid import uuid4
 
-if "messages" and "curr_thread_id" not in st.session_state:
-    st.session_state["messages"]=[]
-    st.session_state["curr_thread_id"]=str(uuid4())
+if "messages" not in st.session_state:
+    st.session_state["messages"] = []
+if "curr_thread_id" not in st.session_state:
+    st.session_state["curr_thread_id"] = str(uuid4())
 
+st.sidebar.title("Threads")
+threads = list({msg["thread_id"] for msg in st.session_state["messages"]})
+if st.session_state["curr_thread_id"] not in threads:
+    threads.append(st.session_state["curr_thread_id"])
 
-def refresh_chats(messages):
-    for i in messages:
-        if i["thread_id"]==st.session_state["curr_thread_id"]:
-            with st.chat_message(i["role"]):
-                st.text(i["content"])
+selected = st.sidebar.radio("Select a thread", threads, index=threads.index(st.session_state["curr_thread_id"]))
+st.session_state["curr_thread_id"] = selected
 
-def refresh_sidebar(messages):
-    for i in set([message['thread_id'] for message in messages]):
-        if st.sidebar.button(i):
-            print("okay")
-
-if user_message:=st.chat_input("type here..."):
-    st.session_state["messages"].append({"thread_id":st.session_state["curr_thread_id"],"role":"user","content":user_message})
-    refresh_chats(st.session_state["messages"])
-    refresh_sidebar(st.session_state["messages"])
-
-
-#st.sidebar.title("hi")
-    
 if st.sidebar.button("new chat"):
-    #send distress signal
+    st.session_state["curr_thread_id"] = str(uuid4())
 
-    #clear session
-    #st.session_state["messages"]=[]
-    st.session_state["curr_thread_id"]=str(uuid4())
-    refresh_chats(st.session_state["messages"])
-    refresh_sidebar(st.session_state["messages"])
 
-    
+for msg in st.session_state["messages"]:
+    if msg["thread_id"] == st.session_state["curr_thread_id"]:
+        with st.chat_message(msg["role"]):
+            st.markdown(msg["content"])
 
+if user_input := st.chat_input("Type here..."):
+    st.session_state["messages"].append({
+        "thread_id": st.session_state["curr_thread_id"],
+        "role": "user",
+        "content": user_input
+    })
+    st.rerun()
