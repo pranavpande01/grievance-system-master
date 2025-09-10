@@ -1,11 +1,17 @@
 from langchain_core.tools import tool
 from langchain_community.tools import DuckDuckGoSearchRun
-
+import datetime
 
 
 
 search_tool=DuckDuckGoSearchRun()
 
+@tool
+def date():
+    """
+    Get the current date and time
+    """
+    return datetime.datetime.now().isoformat()
 @tool
 def calculator(first_num: float, second_num: float, operation: str) -> dict:
     """

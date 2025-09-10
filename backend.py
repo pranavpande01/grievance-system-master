@@ -7,7 +7,7 @@ from langgraph.graph.message import add_messages
 from langchain_core.messages import BaseMessage, HumanMessage
 from langgraph.prebuilt import ToolNode, tools_condition
 import json
-from tools import calculator,search_tool
+from tools import calculator,search_tool,date
 
 load_dotenv()
 
@@ -17,8 +17,8 @@ class State(TypedDict):
     messages:Annotated[List[BaseMessage],add_messages]
 
 def invoke_llm(msessages:State):
-    llm=ChatGoogleGenerativeAI(model="gemini-2.0-flash-lite")
-    llm.bind_tools([calculator,search_tool])
+    llm=ChatGoogleGenerativeAI(model="gemini-2.5-flash")
+    llm=llm.bind_tools([calculator,search_tool,date])
     message=llm.invoke(msessages['messages'])
     
     return {
@@ -35,7 +35,7 @@ checkpoint=InMemorySaver()
 graph=StateGraph(State)
 # define nodes
 graph.add_node("invoke_llm",invoke_llm)
-graph.add_node("tools",ToolNode([calculator,search_tool]))
+graph.add_node("tools",ToolNode([calculator,search_tool,date]))
 # define edges
 graph.add_edge(START,"invoke_llm")
 graph.add_conditional_edges("invoke_llm",tools_condition)
