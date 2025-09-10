@@ -66,3 +66,35 @@ def calculator(first_num: float, second_num: float, operation: str) -> dict:
         return {"first_num": first_num, "second_num": second_num, "operation": operation, "result": result}
     except Exception as e:
         return {"error": str(e)}
+
+@tool
+def send_email(to, subject, body):
+    """
+    Sends a plain text email using STARTTLS via Gmail SMTP.
+
+    Args:
+        to (str): Recipient's email address.
+        subject (str): Subject line of the email.
+        body (str): Plain text body content of the email.
+
+    Note:
+        This function uses Gmail's SMTP server (smtp.gmail.com:587).
+    """
+
+
+    import smtplib,os
+    from email.message import EmailMessage
+
+    user = os.environ['EMAIL_USER']
+    password = os.environ['EMAIL_PASS']
+
+    msg = EmailMessage()
+    msg['Subject'] = subject
+    msg['From'] = user
+    msg['To'] = to
+    msg.set_content(body)
+
+    with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
+        smtp.starttls()
+        smtp.login(user, password)
+        smtp.send_message(msg)
