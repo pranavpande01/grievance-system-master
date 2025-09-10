@@ -5,7 +5,9 @@ from dotenv import load_dotenv
 from typing import TypedDict,List,Annotated
 from langgraph.graph.message import add_messages
 from langchain_core.messages import BaseMessage, HumanMessage
+from langgraph.prebuilt import ToolNode, tools_condition
 import json
+from tools import calculator,search_tool
 
 load_dotenv()
 
@@ -16,13 +18,15 @@ class State(TypedDict):
 
 def invoke_llm(msessages:State):
     llm=ChatGoogleGenerativeAI(model="gemini-2.0-flash-lite")
+    llm.bind_tools([calculator,search_tool])
     message=llm.invoke(msessages['messages'])
+    
     return {
         'messages':message
     }
 
-with open('config.json','r') as file: config=json.load(file)
 
+with open('config.json','r') as file: config=json.load(file)
 #################################################################
 
 # define checkpoint
@@ -31,16 +35,21 @@ checkpoint=InMemorySaver()
 graph=StateGraph(State)
 # define nodes
 graph.add_node("invoke_llm",invoke_llm)
+graph.add_node("tools",ToolNode([calculator,search_tool]))
 # define edges
 graph.add_edge(START,"invoke_llm")
-graph.add_edge("invoke_llm",END)
+graph.add_conditional_edges("invoke_llm",tools_condition)
+graph.add_edge("tools","invoke_llm")
+#graph.add_edge("invoke_llm",END)
 # compile graph
 graph=graph.compile(checkpointer=checkpoint)
 
 #################################################################
 # inference
-graph = graph.invoke(
-    {'messages': [HumanMessage(content="hi what a lovely day")]},
-    config=config
-)
-print(graph['messages'][-1].content)
+def ping(message):
+    global graph
+    pong = graph.invoke(
+        {'messages': [HumanMessage(content=message)]},
+        config=config
+    )
+    return pong
