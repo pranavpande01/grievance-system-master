@@ -4,7 +4,9 @@ from langgraph.graph import StateGraph, START, END
 from dotenv import load_dotenv
 from typing import TypedDict,List,Annotated
 from langgraph.graph.message import add_messages
-from langchain_core.messages import BaseMessage
+from langchain_core.messages import BaseMessage, HumanMessage
+import json
+
 load_dotenv()
 
 #################################################################
@@ -14,9 +16,12 @@ class State(TypedDict):
 
 def invoke_llm(msessages:State):
     llm=ChatGoogleGenerativeAI(model="gemini-2.0-flash-lite")
-    return llm.invoke(msessages['messages'])
+    message=llm.invoke(msessages['messages'])
+    return {
+        'messages':message
+    }
 
-
+with open('config.json','r') as file: config=json.load(file)
 
 #################################################################
 
@@ -34,5 +39,8 @@ graph=graph.compile(checkpointer=checkpoint)
 
 #################################################################
 # inference
-a=graph.invoke("hi what a lovely day")
-print(a)
+graph = graph.invoke(
+    {'messages': [HumanMessage(content="hi what a lovely day")]},
+    config=config
+)
+print(graph['messages'][-1].content)
