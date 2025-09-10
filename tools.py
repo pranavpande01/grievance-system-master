@@ -93,8 +93,23 @@ def send_email(to, subject, body):
     msg['From'] = user
     msg['To'] = to
     msg.set_content(body)
-
+    print("sending email...")
     with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
         smtp.starttls()
         smtp.login(user, password)
         smtp.send_message(msg)
+
+@tool
+def mail_secratary(subject,body):
+    """
+    Sends an email to Mr. Pankaj's personal secretary, mrs. neha.
+    This function composes and sends an email with the specified subject and message
+    to Mr. Pankaj's personal secretary, who knows all his schedules, appointments,  meetings and whereabouts.
+
+    The AI should pass to this function:
+    1. Generated subject
+    2. Generated body
+
+    """
+    #send_email(t"f20212785@pilani.bits-pilani.ac.in",subject,body)
+    

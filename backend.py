@@ -7,11 +7,11 @@ from langgraph.graph.message import add_messages
 from langchain_core.messages import BaseMessage, HumanMessage
 from langgraph.prebuilt import ToolNode, tools_condition
 import json
-from tools import calculator,search_tool,date, console,delay,send_email
+from tools import calculator,search_tool,date, console,delay,send_email, mail_secratary
 
 load_dotenv()
 
-toolbox=[calculator,search_tool,date,console,delay,send_email]
+toolbox=[calculator,search_tool,date,console,delay,send_email,mail_secratary]
 #################################################################
 # util section
 class State(TypedDict):
