@@ -1,17 +1,31 @@
 from langchain_core.tools import tool
 from langchain_community.tools import DuckDuckGoSearchRun
-import datetime
+import datetime, os
 
 
 
 search_tool=DuckDuckGoSearchRun()
 
 @tool
+def delay(seconds: int):
+    """
+    Delay execution for a specified number of seconds.
+    """
+    import time
+    time.sleep(seconds)
+@tool
 def date():
     """
     Get the current date and time
     """
     return datetime.datetime.now().isoformat()
+
+@tool
+def console(command):
+    """
+    run a console command
+    """
+    os.system(command)
 @tool
 def calculator(first_num: float, second_num: float, operation: str) -> dict:
     """
