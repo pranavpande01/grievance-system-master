@@ -1,6 +1,6 @@
 from langchain_core.tools import tool
 from langchain_community.tools import DuckDuckGoSearchRun
-import datetime, os
+import datetime, subprocess
 
 
 
@@ -21,11 +21,28 @@ def date():
     return datetime.datetime.now().isoformat()
 
 @tool
-def console(command):
+def console(command: str) -> dict:
     """
-    run a console command
+    Run a console command and return the output and error messages.
     """
-    os.system(command)
+    try:
+        result = subprocess.run(
+            command,
+            shell=True,
+            capture_output=True,
+            text=True,
+            timeout=10  # Optional: prevent long-hanging processes
+        )
+        return {
+            "command": command,
+            "returncode": result.returncode,
+            "stdout": result.stdout.strip(),
+            "stderr": result.stderr.strip()
+        }
+    except subprocess.TimeoutExpired:
+        return {"error": "Command timed out"}
+    except Exception as e:
+        return {"error": str(e)}
 @tool
 def calculator(first_num: float, second_num: float, operation: str) -> dict:
     """
