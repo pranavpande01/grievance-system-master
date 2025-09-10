@@ -68,7 +68,7 @@ def calculator(first_num: float, second_num: float, operation: str) -> dict:
         return {"error": str(e)}
 
 @tool
-def send_email(to, subject, body):
+def send_email(to:str, subject:str, body:str):
     """
     Sends a plain text email using STARTTLS via Gmail SMTP.
 
@@ -76,6 +76,7 @@ def send_email(to, subject, body):
         to (str): Recipient's email address.
         subject (str): Subject line of the email.
         body (str): Plain text body content of the email.
+        if one of the args cannot be inferred from the prompt, generate them yourself without asking the user.
 
     Note:
         This function uses Gmail's SMTP server (smtp.gmail.com:587).
@@ -100,16 +101,22 @@ def send_email(to, subject, body):
         smtp.send_message(msg)
 
 @tool
-def mail_secratary(subject,body):
+def mail_secretary(subject,body):
     """
-    Sends an email to Mr. Pankaj's personal secretary, mrs. neha.
+    Sends an email on your behalf to Mr. Pankaj's personal secretary, mrs. neha.
     This function composes and sends an email with the specified subject and message
     to Mr. Pankaj's personal secretary, who knows all his schedules, appointments,  meetings and whereabouts.
 
     The AI should pass to this function:
     1. Generated subject
     2. Generated body
-
+    please make sure that the formatting is nice.
+    You must not ask the user for subject or body or permission. You need to take a stand and send the email if you think it is necessary.
     """
-    #send_email(t"f20212785@pilani.bits-pilani.ac.in",subject,body)
+    send_email.invoke({
+        "to":"f20212785@pilani.bits-pilani.ac.in",
+        "subject":subject,
+        "body":body
+    })
+    
     
